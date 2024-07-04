@@ -12,6 +12,8 @@ interface Lesson {
   slug: { current: string };
   content: any;
   images: { asset: { url: string } }[];
+  videoEmbed?: { url: string, title: string };
+  video?: { asset: { _ref: string } };
 }
 
 // Set up the URL builder for images
@@ -19,6 +21,11 @@ const builder = imageUrlBuilder(sanityClient);
 
 function urlFor(source: SanityImageSource) {
   return builder.image(source);
+}
+
+function getVideoUrl(ref: string): string {
+  const [fileType, id, extension] = ref.split('-');
+  return `https://cdn.sanity.io/files/${sanityClient.config().projectId}/${sanityClient.config().dataset}/${id}.${extension}`;
 }
 
 async function getLessonAndAdjacent(lessonSlug: string): Promise<{ lesson: Lesson | null, prevLesson: Lesson | null, nextLesson: Lesson | null }> {
@@ -32,6 +39,12 @@ async function getLessonAndAdjacent(lessonSlug: string): Promise<{ lesson: Lesso
         images[]{
           asset->{
             url
+          }
+        },
+        videoEmbed,
+        video {
+          asset->{
+            _ref
           }
         }
       }
@@ -60,6 +73,30 @@ const serializers = {
           width={500}
           height={300}
         />
+      );
+    },
+    videoEmbed: ({ node }: { node: { url: string, title: string } }) => (
+      <div className="video-embed">
+        <iframe
+          width="560"
+          height="315"
+          src={node.url}
+          title={node.title}
+          style={{ border: 'none' }}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        ></iframe>
+      </div>
+    ),
+    video: ({ node }: { node: { asset: { _ref: string } } }) => {
+      const videoUrl = getVideoUrl(node.asset._ref);
+      return (
+        <div className="video-upload">
+          <video controls width="600">
+            <source src={videoUrl} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
       );
     },
   },
@@ -99,6 +136,27 @@ export default async function LessonPage({ params }: { params: { lessonSlug: str
           projectId="x5lxqimq"
           dataset="production"
         />
+        {lesson.videoEmbed && (
+          <div className="my-6">
+            <iframe
+              width="560"
+              height="315"
+              src={lesson.videoEmbed.url}
+              title={lesson.videoEmbed.title}
+              style={{ border: 'none' }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        )}
+        {lesson.video && (
+          <div className="my-6">
+            <video controls width="600">
+              <source src={getVideoUrl(lesson.video.asset._ref)} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        )}
         <div className="flex justify-between mt-8">
           {prevLesson && (
             <Link href={`./${prevLesson.slug.current}`} className="text-blue-600 hover:underline">
@@ -107,7 +165,7 @@ export default async function LessonPage({ params }: { params: { lessonSlug: str
           )}
           {nextLesson && (
             <Link href={`./${nextLesson.slug.current}`} className="text-blue-600 hover:underline">
-            Next: {nextLesson.title}
+              Next: {nextLesson.title}
             </Link>
           )}
         </div>
