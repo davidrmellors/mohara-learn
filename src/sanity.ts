@@ -8,6 +8,7 @@ export const config = {
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID as string,
   apiVersion: '2021-10-21', // use a UTC date string
   useCdn: process.env.NODE_ENV === 'production',
+  token: process.env.SANITY_API_TOKEN,
 };
 
 // Set up the Sanity client for fetching data

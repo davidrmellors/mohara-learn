@@ -1,5 +1,5 @@
 import { sanityClient } from '~/sanity';
-import Link from 'next/link';
+import ModulePageClient from './ModulePageClient';
 import { notFound } from 'next/navigation';
 
 interface Lesson {
@@ -37,7 +37,7 @@ async function getModule(slug: string): Promise<Module | null> {
   }
 }
 
-export default async function ModulePage({ params }: { params: { moduleSlug: string } }) {
+export default async function ServerModulePage({ params }: { params: { moduleSlug: string } }) {
   if (!params?.moduleSlug) {
     return notFound();
   }
@@ -48,24 +48,7 @@ export default async function ModulePage({ params }: { params: { moduleSlug: str
     return notFound();
   }
 
-  return (
-    <div className="container mx-auto p-6">
-      <div className="bg-white shadow-md rounded-lg p-4">
-        <h1 className="text-4xl font-bold mb-4 text-center">{module.title}</h1>
-        <ul>
-          {Array.isArray(module.lessons) ? (
-            module.lessons.map((lesson) => (
-              <li key={lesson._id} className="mb-2">
-                <Link className="text-2xl font-semibold" href={`/twitter-clone/${params.moduleSlug}/${lesson.slug.current}`}>{lesson.title}</Link>
-              </li>
-            ))
-          ) : (
-            <li>No lessons available.</li>
-          )}
-        </ul>
-      </div>
-    </div>
-  );
+  return <ModulePageClient module={module} moduleSlug={params.moduleSlug} />;
 }
 
 export async function generateStaticParams() {

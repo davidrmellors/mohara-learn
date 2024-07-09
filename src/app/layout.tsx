@@ -18,12 +18,12 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${GeistSans.variable}`}>
         <body>
-          <header className="bg-blue-600 text-white p-4">
+          <header className="bg-black text-white p-4">
             <nav className="container mx-auto flex justify-between">
-              <a href="/" className="text-xl font-bold">Course Website</a>
+              <a href="/" className="text-xl font-bold">Mohara Learn</a>
               <ul className="flex space-x-4">
                 <li><a href="/about" className="hover:underline">About</a></li>
-                <li><a href="/modules" className="hover:underline">Modules</a></li>
+                <li><a href="/twitter-clone" className="hover:underline">Modules</a></li>
                 <li><a href="/contact" className="hover:underline">Contact</a></li>
               </ul>
             </nav>
