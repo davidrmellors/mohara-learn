@@ -6,10 +6,13 @@ interface Module {
   title: string;
   slug: { current: string };
   description: string;
+  lessons: { _id: string }[];
 }
 
 async function getModules() {
-  const modules = await sanityClient.fetch(`*[_type == "module"]{_id, title, slug, description}`);
+  const modules = await sanityClient.fetch(
+    `*[_type == "module"]{_id, title, slug, description, "lessons": lessons[]->{_id}}`,
+  );
   return modules;
 }
 
