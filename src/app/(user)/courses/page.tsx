@@ -5,7 +5,7 @@ export const revalidate = 60; // Revalidate every 60 seconds
 
 const fetchCourses = async () => {
   const coursesData = await sanityClient.fetch(
-    `*[_type == "course"]{_id, title, slug}`,
+    `*[_type == "course"]{_id, title, slug, description} | order(title asc)`,
   );
   return coursesData;
 };

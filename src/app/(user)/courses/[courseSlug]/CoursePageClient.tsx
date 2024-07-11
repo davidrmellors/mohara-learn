@@ -105,23 +105,6 @@ export default function CoursePageClient({
           </div>
         </div>
       </section>
-
-      {/* Contact Section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto text-center px-4">
-          <h2 className="text-3xl font-bold">Get in Touch</h2>
-          <p className="mt-4 text-lg">
-            Have questions? Feel free to reach out to us at{' '}
-            <a
-              href="mailto:support@mohara.co"
-              className="text-blue-600 hover:underline"
-            >
-              support@coursewebsite.com
-            </a>
-            .
-          </p>
-        </div>
-      </section>
     </div>
   );
 }
