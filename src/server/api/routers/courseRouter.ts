@@ -11,24 +11,30 @@ export const courseRouter = createTRPCRouter({
       const { userId } = ctx;
 
       try {
-        // Fetch modules associated with the course
         const modules = await sanityClient.fetch(
           `*[_type == "module" && references($courseId)]{_id}`,
           { courseId },
         );
         const moduleIds = modules.map((module: any) => module._id);
 
-        // Fetch lessons associated with those modules
+        console.log('Modules:', modules);
+
+        if (moduleIds.length === 0) {
+          return {
+            totalLessons: 0,
+            completedLessons: 0,
+            completionPercentage: 0,
+          };
+        }
+
         const lessons = await sanityClient.fetch(
           `*[_type == "lesson" && references($moduleIds)]`,
           { moduleIds },
         );
         const totalLessons = lessons.length;
 
-        console.log('Modules:', modules);
         console.log('Lessons:', lessons);
 
-        // Fetch the user and calculate completed lessons
         const user = await sanityClient.fetch(
           `*[_type == "user" && _id == $userId][0]`,
           { userId },
