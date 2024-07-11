@@ -1,6 +1,6 @@
 import { createClient } from 'next-sanity';
 import imageUrlBuilder from '@sanity/image-url';
-import { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import { type SanityImageSource } from '@sanity/image-url/lib/types/types';
 
 // Configuration for the Sanity client
 export const config = {
@@ -16,5 +16,4 @@ export const sanityClient = createClient(config);
 
 // Set up a helper function for generating image URLs with only the asset reference data in your documents
 export const urlFor = (source: SanityImageSource) =>
-    imageUrlBuilder(config).image(source);
-
+  imageUrlBuilder(config).image(source);

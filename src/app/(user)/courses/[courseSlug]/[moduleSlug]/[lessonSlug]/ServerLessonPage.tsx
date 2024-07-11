@@ -2,7 +2,7 @@ import { sanityClient } from '~/sanity';
 import LessonPageClient from './LessonPageClient';
 import { notFound } from 'next/navigation';
 import imageUrlBuilder from '@sanity/image-url';
-import { SanityImageSource } from '@sanity/image-url/lib/types/types';
+import { type SanityImageSource } from '@sanity/image-url/lib/types/types';
 
 interface ImageType {
   asset: {
@@ -31,10 +31,17 @@ function getVideoFileUrl(ref: string): string {
   return `https://cdn.sanity.io/files/${sanityClient.config().projectId}/${sanityClient.config().dataset}/${id}.${extension}`;
 }
 
-async function getLessonAndAdjacent(lessonSlug: string): Promise<{ lesson: Lesson | null, prevLesson: Lesson | null, nextLesson: Lesson | null }> {
+async function getLessonAndAdjacent(
+  lessonSlug: string,
+): Promise<{
+  lesson: Lesson | null;
+  prevLesson: Lesson | null;
+  nextLesson: Lesson | null;
+}> {
   try {
     // Fetch the single lesson based on the slug
-    const lesson = await sanityClient.fetch(`
+    const lesson = await sanityClient.fetch(
+      `
       *[_type == "lesson" && slug.current == $slug][0]{
         _id,
         title,
@@ -49,7 +56,9 @@ async function getLessonAndAdjacent(lessonSlug: string): Promise<{ lesson: Lesso
           }
         }
       }
-    `, { slug: lessonSlug });
+    `,
+      { slug: lessonSlug },
+    );
 
     if (!lesson) {
       return { lesson: null, prevLesson: null, nextLesson: null };
@@ -64,30 +73,47 @@ async function getLessonAndAdjacent(lessonSlug: string): Promise<{ lesson: Lesso
       }
     `);
 
-    const currentIndex = allLessons.findIndex((l: { slug: { current: string } }) => l.slug.current === lessonSlug);
+    const currentIndex = allLessons.findIndex(
+      (l: { slug: { current: string } }) => l.slug.current === lessonSlug,
+    );
 
     const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
-    const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
+    const nextLesson =
+      currentIndex < allLessons.length - 1
+        ? allLessons[currentIndex + 1]
+        : null;
 
     return { lesson, prevLesson, nextLesson };
   } catch (error) {
-    console.error("Failed to fetch lesson data:", error);
+    console.error('Failed to fetch lesson data:', error);
     return { lesson: null, prevLesson: null, nextLesson: null };
   }
 }
 
-export default async function ServerLessonPage({ params }: { params: { lessonSlug: string } }) {
+export default async function ServerLessonPage({
+  params,
+}: {
+  params: { lessonSlug: string };
+}) {
   if (!params?.lessonSlug) {
     return notFound();
   }
 
-  const { lesson, prevLesson, nextLesson } = await getLessonAndAdjacent(params.lessonSlug);
+  const { lesson, prevLesson, nextLesson } = await getLessonAndAdjacent(
+    params.lessonSlug,
+  );
 
   if (!lesson) {
     return notFound();
   }
 
-  return <LessonPageClient lesson={lesson} prevLesson={prevLesson} nextLesson={nextLesson} />;
+  return (
+    <LessonPageClient
+      lesson={lesson}
+      prevLesson={prevLesson}
+      nextLesson={nextLesson}
+    />
+  );
 }
 
 export async function generateStaticParams() {
